@@ -402,16 +402,6 @@ export const registerMeme = (payload) => async (dispatch) => {
       console.error(err);
       document.getElementById("registerMeme").innerText = "Failed. Try Again!";
     } else {
-      let metadata = res["1"].split(",");
-      dispatch({
-        type: types.ADD_MEME,
-        payload: {
-          address: res["0"],
-          name: metadata[0],
-          price: metadata[1],
-          path: result.path.path,
-        },
-      });
       document.getElementById("registerMeme").innerText = "Create Meme";
       document.getElementById("success").style.visibility = "";
     }

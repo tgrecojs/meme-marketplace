@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
+import Web3 from "web3";
 import Footer from "../Footer";
 import { loginAndCreateBucket } from "../../redux/actions/hub";
 
@@ -22,7 +23,7 @@ function Login(props) {
       <button
         id="login"
         className="btn btn-primary mb-2"
-        onClick={() => loginAndCreateBucket()}
+        onClick={() => loadWeb3(loginAndCreateBucket)}
       >
         Log in
       </button>
@@ -32,6 +33,20 @@ function Login(props) {
     </Fragment>
   );
 }
+
+const loadWeb3 = async (loginAndCreateBucket) => {
+  if (window.ethereum) {
+    window.web3 = new Web3(window.ethereum);
+    await window.ethereum.enable();
+    loginAndCreateBucket();
+  } else if (window.web3) {
+    window.web3 = new Web3(window.web3.currentProvider);
+  } else {
+    window.alert(
+      "Non-Ethereum browser detected. You should consider trying MetaMask!"
+    );
+  }
+};
 
 const mapStateToProps = (state) => ({
   bucket: state.app.bucket,
