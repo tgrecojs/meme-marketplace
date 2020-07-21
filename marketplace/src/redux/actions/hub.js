@@ -5,6 +5,7 @@ import {
   getTotalSupply,
   awardMemeToken,
   getTokenMetadata,
+  getTokenOwner,
 } from "../../utils/blockchain";
 
 const API = false ? "http://localhost:3007" : undefined;
@@ -285,9 +286,7 @@ class HubClient {
 
     // Check if the Bucket Exists or not
     if (this.buckets) {
-      console.log("ADDING...");
       const raw = await this.buckets.pushPath(this.bucketKey, path, content);
-      console.log("ADDED");
       return raw;
     } else {
       console.error("Bucket does not exist");
@@ -417,20 +416,26 @@ export const getMemeTokenList = () => async (dispatch) => {
   // Get the total count of meme tokens
   const totalSupply = parseInt((await getTotalSupply())["0"]);
 
-  // Create a request to blockchain to get the meme metadata for each token
-  let promiseArr = [];
+  // Create a request to blockchain to get the meme metadata and owner for each token
+  let metadataPromiseArr = [];
+  let ownerPromiseArr = [];
   for (let i = 1; i <= totalSupply; i++) {
-    promiseArr.push(getTokenMetadata(i));
+    metadataPromiseArr.push(getTokenMetadata(i));
+    ownerPromiseArr.push(getTokenOwner(i));
   }
-  let memesTokenList = await Promise.all(promiseArr);
+
+  let memesTokenList = await Promise.all(metadataPromiseArr);
+  let memesOwnerList = await Promise.all(ownerPromiseArr);
 
   // Parse the fecthed metadata to get back the meme details
-  memesTokenList = memesTokenList.map((token) => {
+  memesTokenList = memesTokenList.map((token, index) => {
     token = token["0"].split(",");
+    let owner = memesOwnerList[0]["0"].split(",")[0];
     return {
       name: token[0],
       price: token[1],
       path: token[2],
+      owner: owner,
     };
   });
 

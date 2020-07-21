@@ -90,11 +90,12 @@ function CreateMeme(props) {
           const price = document.getElementById("price").value;
           var arrayBuffer, uint8Array;
           var fileReader = new FileReader();
-          fileReader.onload = function () {
+          fileReader.onload = async function () {
             arrayBuffer = this.result;
             uint8Array = new Uint8Array(arrayBuffer);
+            let addressArr = await window.web3.eth.getAccounts();
             registerMeme({
-              address: window.web3.eth.accounts[0],
+              address: addressArr[0],
               fileBuffer: uint8Array,
               name: name,
               price: price,

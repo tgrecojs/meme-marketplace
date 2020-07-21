@@ -26,7 +26,7 @@ export const awardMemeToken = (address, tokenMetadata, callback) => {
   );
 };
 
-export const getTokenOwner = (tokenId, callback) => {
+export const getTokenOwner = (tokenId) => {
   return new Promise((resolve, reject) => {
     let data = MemeMarketplace.methods.ownerOf(tokenId).encodeABI();
 
@@ -37,16 +37,8 @@ export const getTokenOwner = (tokenId, callback) => {
         data: data,
       })
       .then((receipt) => {
-        receipt.logs.forEach((log) => {
-          if (log.data !== "0x") {
-            let res = web3.eth.abi.decodeParameters(
-              ["address", "string"],
-              log.data
-            );
-            callback(null, res);
-            resolve(res);
-          }
-        });
+        let res = web3.eth.abi.decodeParameters(["address"], receipt);
+        resolve(res);
       })
       .catch((err) => {
         reject(err);

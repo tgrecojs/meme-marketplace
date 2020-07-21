@@ -45,6 +45,9 @@ function Marketplace(props) {
                   <div className="card-body">
                     <h5 className="card-title">{meme.name}</h5>
                     <p className="card-text">{meme.price}</p>
+                    <font size="1">{meme.owner}</font>
+                    <br />
+                    <br />
                     <a
                       target="_blank"
                       href={`https://hub.textile.io${meme.path}`}
