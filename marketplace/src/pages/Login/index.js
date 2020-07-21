@@ -39,11 +39,9 @@ const loadWeb3 = async (loginAndCreateBucket) => {
     window.web3 = new Web3(window.ethereum);
     await window.ethereum.enable();
     loginAndCreateBucket();
-  } else if (window.web3) {
-    window.web3 = new Web3(window.web3.currentProvider);
   } else {
     window.alert(
-      "Non-Ethereum browser detected. You should consider trying MetaMask!"
+      "Metamask not detected! Install Metamask plugin to proceed: https://metamask.io/download.html"
     );
   }
 };

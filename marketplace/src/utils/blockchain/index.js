@@ -7,12 +7,11 @@ const web3 = new Web3(new Web3.providers.HttpProvider(NETWORK_URL));
 
 const MemeMarketplace = new web3.eth.Contract(contract.abi, contract.address, {
   from: metamask.eth.accounts[0],
-  gas: 3000000,
 });
 
-export const awardMemeToken = (tokenMetadata, callback) => {
+export const awardMemeToken = (address, tokenMetadata, callback) => {
   let data = MemeMarketplace.methods
-    .awardMemeToken(metamask.eth.accounts[0], tokenMetadata)
+    .awardMemeToken(address, tokenMetadata)
     .encodeABI();
 
   metamask.eth.sendTransaction(

@@ -94,6 +94,7 @@ function CreateMeme(props) {
             arrayBuffer = this.result;
             uint8Array = new Uint8Array(arrayBuffer);
             registerMeme({
+              address: window.web3.eth.accounts[0],
               fileBuffer: uint8Array,
               name: name,
               price: price,

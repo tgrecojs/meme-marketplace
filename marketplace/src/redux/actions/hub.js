@@ -385,7 +385,7 @@ export const listPath = (payload) => async (dispatch) => {
 };
 
 export const registerMeme = (payload) => async (dispatch) => {
-  const { name, price, fileBuffer } = payload;
+  const { address, name, price, fileBuffer } = payload;
 
   document.getElementById("registerMeme").innerText =
     "Adding meme to Textile Bucket...";
@@ -397,15 +397,20 @@ export const registerMeme = (payload) => async (dispatch) => {
     "Registering Meme NFT on Local Blockchain...";
 
   // register a meme token
-  awardMemeToken(`${name},${price},${result.path.path}`, (err, res) => {
-    if (err) {
-      console.error(err);
-      document.getElementById("registerMeme").innerText = "Failed. Try Again!";
-    } else {
-      document.getElementById("registerMeme").innerText = "Create Meme";
-      document.getElementById("success").style.visibility = "";
+  awardMemeToken(
+    address,
+    `${name},${price},${result.path.path}`,
+    (err, res) => {
+      if (err) {
+        console.error(err);
+        document.getElementById("registerMeme").innerText =
+          "Failed. Try Again!";
+      } else {
+        document.getElementById("registerMeme").innerText = "Create Meme";
+        document.getElementById("success").style.visibility = "";
+      }
     }
-  });
+  );
 };
 
 export const getMemeTokenList = () => async (dispatch) => {
