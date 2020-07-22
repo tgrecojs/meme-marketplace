@@ -144,8 +144,6 @@ class HubClient {
   setupIdentity = async () => {
     /** Create or get identity */
     this.id = await getIdentity();
-    /** Contains the full identity (including private key) */
-    const identity = this.id.toString();
 
     /** Render our avatar */
     /* displayAvatar(identity) */
@@ -244,7 +242,7 @@ class HubClient {
   createBucket = async () => {
     /** Authenticate and open a Bucket */
     this.buckets = await Buckets.withUserAuth(this.auth);
-    const root = await this.buckets.open("memes-1");
+    const root = await this.buckets.open("memes");
     this.bucketKey = root.key;
     return this.buckets;
   };
@@ -334,7 +332,6 @@ export const loginAndCreateBucket = () => async (dispatch) => {
 
   // Creating & Opening a Bucket
   const bucket = await hubClient.createBucket();
-  console.log(bucket);
 
   dispatch({
     type: types.CREATE_BUCKET,
@@ -344,7 +341,6 @@ export const loginAndCreateBucket = () => async (dispatch) => {
 
 export const createBucket = (payload) => async (dispatch) => {
   const bucket = await hubClient.createBucket();
-  console.log(bucket);
   dispatch({
     type: types.CREATE_BUCKET,
     payload: bucket,
