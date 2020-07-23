@@ -187,7 +187,7 @@ class HubClient {
 
 const hubClient = new HubClient();
 
-export const setupIdentity = (payload) => async (dispatch) => {
+export const setupIdentity = () => async (dispatch) => {
   const publicKey = await hubClient.setupIdentity();
   dispatch({
     type: types.SETUP_IDENTITY,
@@ -218,7 +218,7 @@ export const loginAndCreateBucket = () => async (dispatch) => {
   });
 };
 
-export const createBucket = (payload) => async (dispatch) => {
+export const createBucket = () => async (dispatch) => {
   const bucket = await hubClient.createBucket();
   dispatch({
     type: types.CREATE_BUCKET,
@@ -226,7 +226,7 @@ export const createBucket = (payload) => async (dispatch) => {
   });
 };
 
-export const registerMeme = (payload) => async (dispatch) => {
+export const registerMeme = (payload) => async () => {
   const { address, name, price, fileBuffer } = payload;
 
   document.getElementById("registerMeme").innerText =
@@ -288,12 +288,5 @@ export const getMemeTokenList = () => async (dispatch) => {
       memesTokenList: memesTokenList,
       totalMemes: totalSupply,
     },
-  });
-};
-
-export const getTotalMemes = (payload) => async (dispatch) => {
-  // Gets total number of registered memes
-  getTotalSupply((err, res) => {
-    console.log(err, res);
   });
 };
