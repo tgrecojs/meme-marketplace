@@ -1,14 +1,12 @@
 import types from "../constants";
-import { Client, Buckets } from "@textile/hub";
-import { Libp2pCryptoIdentity, ThreadID } from "@textile/threads-core";
+import { Buckets } from "@textile/hub";
+import { Libp2pCryptoIdentity } from "@textile/threads-core";
 import {
   getTotalSupply,
   awardMemeToken,
   getTokenMetadata,
   getTokenOwner,
 } from "../../utils/blockchain";
-
-const API = false ? "http://localhost:3007" : undefined;
 
 /**
  * Creates a new random keypair-based Identity
@@ -48,17 +46,6 @@ const getIdentity = async () => {
       return err.message;
     }
   }
-};
-
-/**
- * Method for using the server to create credentials without identity
- */
-const createCredentials = async () => {
-  const response = await fetch(`/api/userauth`, {
-    method: "GET",
-  });
-  const userAuth = await response.json();
-  return userAuth;
 };
 
 /**
@@ -104,7 +91,7 @@ const loginWithChallenge = async (id) => {
           case "challenge": {
             /** Convert the challenge json to a Buffer */
             const buf = Buffer.from(data.value);
-            /** User our identity to sign the challenge */
+            /** Use our identity to sign the challenge */
             const signed = await id.sign(buf);
             /** Send the signed challenge back to the server */
             socket.send(
@@ -145,32 +132,11 @@ class HubClient {
     /** Create or get identity */
     this.id = await getIdentity();
 
-    /** Render our avatar */
-    /* displayAvatar(identity) */
-
     /** Get the public key */
     const publicKey = this.id.public.toString();
 
     /** Return the publicKey short ID */
     return publicKey;
-  };
-
-  listThreads = async () => {
-    if (!this.auth) {
-      throw Error("User not authenticated");
-    }
-
-    /** Setup a new connection with the API and our user auth */
-    const client = Client.withUserAuth(this.auth, API);
-
-    /** Query for all the user's existing threads (expected none) */
-    const threads = await client.listThreads();
-
-    /** Query for all the user's existing buckets (expected none) */
-
-    /** Display the results */
-    console.log(JSON.stringify(threads.listList));
-    /* displayThreadsList(JSON.stringify(result.listList)); */
   };
 
   /**
@@ -195,86 +161,12 @@ class HubClient {
     return this.auth;
   };
 
-  /**
-   * Provides a basic auth where
-   * - the server doesn't care about the user identity
-   * - the server just provides user auth on any request
-   *
-   * see simple.html for example running this method
-   */
-  simpleAuth = async () => {
-    if (!this.id) {
-      throw Error("No user ID found");
-    }
-
-    /** Use the simple auth REST endpoint to get API access */
-    this.auth = await createCredentials();
-
-    console.log("Verified on Textile API");
-    /* displayStatus(); */
-
-    /** The simple auth endpoint generates a user's Hub API Token */
-    const client = Client.withUserAuth(this.auth, API);
-    const token = await client.getToken(this.id);
-
-    /** Update our auth to include the token */
-    this.auth = {
-      ...this.auth,
-      token: token,
-    };
-  };
-
-  getBucketThreadID = async () => {
-    try {
-      var storedThread = localStorage.getItem("bucket-thread-id-1");
-      if (storedThread === null) {
-        throw new Error("No thread id");
-      }
-      const restored = ThreadID.fromString(storedThread);
-      return restored;
-    } catch (e) {
-      const newThread = ThreadID.fromRandom();
-      localStorage.setItem("bucket-thread-id-1", newThread.toString());
-      return newThread;
-    }
-  };
-
   createBucket = async () => {
     /** Authenticate and open a Bucket */
     this.buckets = await Buckets.withUserAuth(this.auth);
     const root = await this.buckets.open("memes");
     this.bucketKey = root.key;
     return this.buckets;
-  };
-
-  doesBucketExist = async () => {
-    /**
-     * List existing Buckets
-     */
-    if (this.buckets) {
-      const roots = await this.buckets.list();
-      console.log(roots);
-      const existing = roots.find((bucket) => bucket.name === "memes");
-      console.log(existing);
-      return existing;
-    } else {
-      return false;
-    }
-  };
-
-  // Read existing Buckets
-  readBuckets = async (path) => {
-    // Check if the Bucket Exists or not
-    const exists = await this.doesBucketExist();
-
-    if (exists) {
-      console.log("Data Found");
-      const bucketKey = exists.key;
-      return this.buckets.pullPath(bucketKey, path);
-    } else {
-      console.error("Data Not Found");
-      return null;
-    }
   };
 
   addFileToBucket = async (path, content) => {
@@ -286,19 +178,6 @@ class HubClient {
     if (this.buckets) {
       const raw = await this.buckets.pushPath(this.bucketKey, path, content);
       return raw;
-    } else {
-      console.error("Bucket does not exist");
-      return null;
-    }
-  };
-
-  listBucketPaths = async (path) => {
-    // Check if the Bucket Exists or not
-    const exists = await this.doesBucketExist();
-
-    if (exists) {
-      const paths = await this.listPath(exists.key, path);
-      return paths;
     } else {
       console.error("Bucket does not exist");
       return null;
@@ -344,38 +223,6 @@ export const createBucket = (payload) => async (dispatch) => {
   dispatch({
     type: types.CREATE_BUCKET,
     payload: bucket,
-  });
-};
-
-export const doesBucketExist = (payload) => async (dispatch) => {
-  const exists = await hubClient.doesBucketExist();
-  dispatch({
-    type: types.DOES_BUCKET_EXIST,
-    payload: exists,
-  });
-};
-
-export const readBucket = (payload) => async (dispatch) => {
-  const bucket = await hubClient.readBuckets(payload.path);
-  dispatch({
-    type: types.READ_BUCKET,
-    payload: bucket,
-  });
-};
-
-export const addDataToBucket = (payload) => async (dispatch) => {
-  const result = await hubClient.addFileToBucket(payload.path, payload.content);
-  dispatch({
-    type: types.ADD_FILE_TO_BUCKET,
-    payload: result,
-  });
-};
-
-export const listPath = (payload) => async (dispatch) => {
-  const result = await hubClient.listBucketPaths(payload.path);
-  dispatch({
-    type: types.LIST_BUCKET_PATH,
-    payload: result,
   });
 };
 
