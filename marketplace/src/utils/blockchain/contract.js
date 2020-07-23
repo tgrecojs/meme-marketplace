@@ -450,5 +450,5 @@ const abi = [
 
 module.exports = {
   abi,
-  address: "0xf0e921fb6cEf6E11273D69a97AF40c60E5f267Dc",
+  address: "contract_address_here",
 };
