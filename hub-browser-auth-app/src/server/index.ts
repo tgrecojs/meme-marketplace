@@ -12,7 +12,6 @@ import cors from "@koa/cors";
 import dotenv from "dotenv";
 
 import wss from "./wss";
-import api from "./api";
 
 dotenv.config();
 
@@ -37,14 +36,6 @@ app.use(cors());
  */
 const router = new Router();
 app.use(router.routes()).use(router.allowedMethods());
-
-/**
- * Create Rest endpoint for server-side token issue
- *
- * See ./api.ts
- */
-app.use(api.routes());
-app.use(api.allowedMethods());
 
 /**
  * Create Websocket endpoint for client-side token challenge
